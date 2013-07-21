@@ -1,0 +1,7 @@
+* Improve synchronize documentation to disucuss session.synchronized behaviour.
+* Prove uselessness in adding a synchronize to all
+* Investigate if resolve_query needs a synchronize block becaue it now appears as if all callers wrap it in one anyway.  However, we may not want all() to wrap resolve_query in one.  If that's the case we may need to add a wait_time to the resolve query call (or rely on the query's wait value).
+* node/matchers for buttons need to take options hash.
+* rspec/matchers have_button, have_checked_field, and have_unchecked_field all need to take options hash.
+* Add Capybara::Poltergeist::MouseEventFailed to driver events caught by synchronize
+* Find the best way to add RSpec::Expectations::ExpectationNotMetError to the set of errors the base.rb defines so that they get caught in the synchronize
