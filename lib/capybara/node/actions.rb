@@ -10,7 +10,9 @@ module Capybara
       # @param [String] locator      Text, id or value of link or button
       #
       def click_link_or_button(locator, options={})
-        find(:link_or_button, locator, options).click
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          find(:link_or_button, locator, options).click
+        end
       end
       alias_method :click_on, :click_link_or_button
 
@@ -24,7 +26,9 @@ module Capybara
       # @option options [String] :href    The value the href attribute must be
       #
       def click_link(locator, options={})
-        find(:link, locator, options).click
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          find(:link, locator, options).click
+        end
       end
 
       ##
@@ -34,7 +38,9 @@ module Capybara
       # @param [String] locator      Text, id or value of button
       #
       def click_button(locator, options={})
-        find(:button, locator, options).click
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          find(:button, locator, options).click
+        end
       end
 
       ##
@@ -50,7 +56,9 @@ module Capybara
       def fill_in(locator, options={})
         raise "Must pass a hash containing 'with'" if not options.is_a?(Hash) or not options.has_key?(:with)
         with = options.delete(:with)
-        find(:fillable_field, locator, options).set(with)
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          find(:fillable_field, locator, options).set(with)
+        end
       end
 
       ##
@@ -63,7 +71,9 @@ module Capybara
       # @param [String] locator           Which radio button to choose
       #
       def choose(locator, options={})
-        find(:radio_button, locator, options).set(true)
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          find(:radio_button, locator, options).set(true)
+        end
       end
 
       ##
@@ -76,7 +86,9 @@ module Capybara
       # @param [String] locator           Which check box to check
       #
       def check(locator, options={})
-        find(:checkbox, locator, options).set(true)
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          find(:checkbox, locator, options).set(true)
+        end
       end
 
       ##
@@ -89,7 +101,9 @@ module Capybara
       # @param [String] locator           Which check box to uncheck
       #
       def uncheck(locator, options={})
-        find(:checkbox, locator, options).set(false)
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          find(:checkbox, locator, options).set(false)
+        end
       end
 
       ##
@@ -104,11 +118,12 @@ module Capybara
       # @param [Hash{:from => String}] options  The id, name or label of the select box
       #
       def select(value, options={})
-        if options.has_key?(:from)
-          from = options.delete(:from)
-          find(:select, from, options).find(:option, value, options).select_option
-        else
-          find(:option, value, options).select_option
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          select_context = self
+          if options.has_key?(:from)
+            select_context = find(:select, options[:from], options.reject{|k,v| k == :from})
+          end
+          select_context.find(:option, value, options.reject{|k,v| k == :from}).select_option
         end
       end
 
@@ -124,11 +139,12 @@ module Capybara
       # @param [Hash{:from => String}] options  The id, name or label of the select box
       #
       def unselect(value, options={})
-        if options.has_key?(:from)
-          from = options.delete(:from)
-          find(:select, from, options).find(:option, value, options).unselect_option
-        else
-          find(:option, value, options).unselect_option
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          select_context = self
+          if options.has_key?(:from)
+            select_context = find(:select, options[:from], options.reject{|k,v| k == :from})
+          end
+          select_context.find(:option, value, options.reject{|k,v| k == :from}).unselect_option
         end
       end
 
@@ -146,7 +162,9 @@ module Capybara
         Array(path).each do |p|
           raise Capybara::FileNotFound, "cannot attach file, #{p} does not exist" unless File.exist?(p.to_s)
         end
-        find(:file_field, locator, options).set(path)
+        synchronize(options[:wait] || Capybara.default_wait_time) do
+          find(:file_field, locator, options).set(path)
+        end
       end
     end
   end
